@@ -1,6 +1,0 @@
-# Dependencies
-# Windows host
-sqlite3.dll
-
-# Linux host
-sqlite3.so
