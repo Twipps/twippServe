@@ -3,9 +3,27 @@ program twippServe;
 
 uses Classes, SysUtils, fphttpapp, httpdefs, httproute;
 
+function fetchImage(imageID: int8): TFileStream;
+var
+    rStream: TFileStream; {images/fonts need a file stream since they are binaries}
+
+begin
+    case imageID of
+    0:
+        begin
+            rStream := TFileStream.Create('../../web/images/banner.png',
+             fmOpenRead or fmShareDenyWrite);
+        end;
+    else
+        writeLn('Fetch Error: Requested imageID not found.');
+    end;
+
+    result := rStream;
+end;
+
 function fetchFont(fontID: int8): TFileStream;
 var
-    rStream: TFileStream; {fonts need a file stream since they are binaries}
+    rStream: TFileStream;
 
 begin
     case fontID of
@@ -17,7 +35,7 @@ begin
     1:
         begin
             rStream := TFileStream.Create('../../web/fonts/AlumniSansPinstripe-Italic.ttf',
-             fmOpenRead or fmShareDenyWrite);
+             fmOpenRead or fmShareDenyWrite); {file manager open read; file manager deny write access, makes a lock() file or something similar}
         end;
     else
         writeLn('Fetch Error: Requested fontID not found.');
@@ -80,6 +98,24 @@ begin
     result := rHtml;
 end;
 
+procedure routeImageBanner(request: TRequest; response: TResponse);
+const 
+    imageID: int8 = 0;
+
+var 
+    imageStream: TFileStream;
+
+begin
+    response.Code := 200;
+    response.CodeText := 'OK';
+    response.ContentType := 'image/png';
+    writeLn(request.ProtocolVersion + ' ' + request.Method + ' ' + IntToStr(response.Code) 
+    + ' ' + response.CodeText + ': Serving imageID ' + IntToStr(imageID) + ' to ' + request.RemoteAddr);
+    imageStream := fetchImage(imageID);
+    response.ContentLength := imageStream.Size;
+    response.ContentStream := imageStream;
+end;
+
 {alumni sans pinstripe}
 procedure routeFontASPR(request: TRequest; response: TResponse);
 const
@@ -118,7 +154,7 @@ begin
     response.ContentStream := fontStream;
 end;
 
-procedure routeBackgroundStyle(request: TRequest; response: TResponse);
+procedure routeBaseStyle(request: TRequest; response: TResponse);
 const
     styleSheetID: int8 = 0;
 
@@ -132,7 +168,7 @@ begin
     response.Content := fetchStyle(styleSheetID);
 end;
 
-procedure routeMain(request: TRequest; response: TResponse);
+procedure routeIndex(request: TRequest; response: TResponse);
 const 
     routeID: int8 = 0;
 
@@ -150,15 +186,18 @@ var
 
 begin
     {Registers routes for the handler to manage}
-    HTTPRouter.RegisterRoute('/', @routeMain);
+    HTTPRouter.RegisterRoute('/', @routeIndex);
     writeln('----- Starting twippServe -----');
 
     {serves the background css}
-    HTTPRouter.RegisterRoute('/css/baseStyle.css', @routeBackgroundStyle);
+    HTTPRouter.RegisterRoute('/css/baseStyle.css', @routeBaseStyle);
 
     {serves the fonts}
     HTTPRouter.RegisterRoute('/fonts/AlumniSansPinstripe-Regular.ttf', @routeFontASPR);
     HTTPRouter.RegisterRoute('/fonts/AlumniSansPinstripe-Italic.ttf', @routeFontASPI);
+
+    {serves the images}
+    HTTPRouter.RegisterRoute('/images/banner.png', @routeImageBanner);
 
     {Sets up the port}
     Application.Port := 700;

@@ -19,6 +19,33 @@ body {
 p {
     color: white;
     font-family: "Alumni Sans Pinstripe", sans-serif;
-    font-size: 60px;
+    font-size: 30px;
     text-align: center;
+}
+
+.container {
+  max-width: 85vw; /*85 percent of view window width*/
+  width: 75vh;
+  height: fit-content;
+  padding: 15px; /*can set padding the set percentages*/
+  margin-top: 5vh; /*these kinda tags rep calcs() you can do*/
+  margin-bottom: 20vh; /*20% view window height*/
+  margin-left: auto;
+  margin-right: auto;
+  /*border: 1px solid rgba(255, 255, 255, 0.5);*/
+}
+
+/* images need to be tied to a parent to control them*/
+/* sed to force the image to resize*/
+.bannerContainer {
+  width: 100%;       /* Spans full screen width */
+  height: 250px;     /* Forces the banner height*/
+  opacity: 100%; /*make this shift gradual*/
+}
+
+.bannerImage {  
+  width: 100%;       /* Shrinks image width to match container */
+  height: 100%;      /* Shrinks image height to match container */
+  object-fit: contain; /* Crops the top/bottom seamlessly without squishing */
+  object-position: center 55%; /*image position within the frame*/
 }
