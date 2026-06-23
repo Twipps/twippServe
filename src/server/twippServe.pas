@@ -3,6 +3,29 @@ program twippServe;
 
 uses Classes, SysUtils, fphttpapp, httpdefs, httproute;
 
+function fetchFont(fontID: int8): TFileStream;
+var
+    rStream: TFileStream; {fonts need a file stream since they are binaries}
+
+begin
+    case fontID of
+    0:
+        begin
+            rStream := TFileStream.Create('../../web/fonts/AlumniSansPinstripe-Regular.ttf',
+             fmOpenRead or fmShareDenyWrite);
+        end;
+    1:
+        begin
+            rStream := TFileStream.Create('../../web/fonts/AlumniSansPinstripe-Italic.ttf',
+             fmOpenRead or fmShareDenyWrite);
+        end;
+    else
+        writeLn('Fetch Error: Requested fontID not found.');
+    end;
+
+    result := rStream;
+end;
+
 function fetchStyle(styleSheetID: int8): string;
 var
     rCss: string;
@@ -14,9 +37,9 @@ begin
 
     try
     case styleSheetID of
-      0:
-      begin
-            stringList.LoadFromFile('../../web/css/backgroundStyle.css');
+    0:
+        begin
+            stringList.LoadFromFile('../../web/css/baseStyle.css');
             rCss := stringList.Text;
         end;
     else
@@ -41,8 +64,8 @@ begin
 
     try
     case pageID of
-      0:
-      begin
+    0:
+        begin
             stringList.LoadFromFile('../../web/html/twipp.html');
             rHtml := stringList.Text;
         end;
@@ -57,13 +80,54 @@ begin
     result := rHtml;
 end;
 
+{alumni sans pinstripe}
+procedure routeFontASPR(request: TRequest; response: TResponse);
+const
+    fontID: int8 = 0;
+    
+var 
+    fontStream: TFileStream;
+
+begin
+    response.Code := 200;
+    response.CodeText := 'OK';
+    response.ContentType := 'font/tff';
+    writeLn(request.Method + ' ' + IntToStr(response.Code) + ' ' + response.CodeText +
+     ': Serving fontID ' + IntToStr(fontID) + ' to ' + request.RemoteAddr);
+    fontStream := fetchFont(fontID);
+    response.ContentLength := fontStream.Size;
+    response.ContentStream := fontStream;
+end;
+
+{alumni sans pinstripe itallic}
+procedure routeFontASPI(request: TRequest; response: TResponse);
+const
+    fontID: int8 = 1;
+
+var 
+    fontStream: TFileStream;
+
+begin
+    response.Code := 200;
+    response.CodeText := 'OK';
+    response.ContentType := 'font/tff';
+    writeLn(request.Method + ' ' + IntToStr(response.Code) + ' ' + response.CodeText +
+     ': Serving fontID ' + IntToStr(fontID) + ' to ' + request.RemoteAddr);
+    fontStream := fetchFont(fontID);
+    response.ContentLength := fontStream.Size;
+    response.ContentStream := fontStream;
+end;
+
 procedure routeBackgroundStyle(request: TRequest; response: TResponse);
 const
     styleSheetID: int8 = 0;
 
 begin
     response.Code := 200;
-    writeLn(request.Method + ': Serving styleSheetID ' + IntToStr(styleSheetID) + ' to ' + request.RemoteAddr);
+    response.CodeText := 'OK';
+    response.ContentType := 'text/css'; {this is important so chrome knows what type it is}
+    writeLn(request.Method + ' ' + IntToStr(response.Code) + ' ' + response.CodeText +
+     ': Serving styleSheetID ' + IntToStr(styleSheetID) + ' to ' + request.RemoteAddr);
     response.Content := fetchStyle(styleSheetID);
 end;
 
@@ -73,7 +137,10 @@ const
 
 begin
     response.Code := 200;
-    writeLn(request.Method + ': Serving pageID ' + IntToStr(routeID) + ' to ' + request.RemoteAddr);
+    response.CodeText := 'OK';
+    response.ContentType := 'text/html';
+    writeLn(request.Method + ' ' + IntToStr(response.Code) + ' ' + response.CodeText +
+     ': Serving pageID ' + IntToStr(routeID) + ' to ' + request.RemoteAddr);
     response.Content := fetchPage(routeID);
 end;
 
@@ -86,7 +153,11 @@ begin
     writeln('----- Starting twippServe -----');
 
     {serves the background css}
-    HTTPRouter.RegisterRoute('/css/backSgroundStyle.css', @routeBackgroundStyle);
+    HTTPRouter.RegisterRoute('/css/baseStyle.css', @routeBackgroundStyle);
+
+    {serves the fonts}
+    HTTPRouter.RegisterRoute('/fonts/AlumniSansPinstripe-Regular.ttf', @routeFontASPR);
+    HTTPRouter.RegisterRoute('/fonts/AlumniSansPinstripe-Italic.ttf', @routeFontASPI);
 
     {Sets up the port}
     Application.Port := 700;
