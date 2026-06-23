@@ -37,6 +37,11 @@ begin
             rStream := TFileStream.Create('../../web/fonts/AlumniSansPinstripe-Italic.ttf',
              fmOpenRead or fmShareDenyWrite); {file manager open read; file manager deny write access, makes a lock() file or something similar}
         end;
+    2:
+        begin
+            rStream := TFileStream.Create('../../web/fonts/Oswald-VariableFont_wght.ttf',
+             fmOpenRead or fmShareDenyWrite); {file manager open read; file manager deny write access, makes a lock() file or something similar}
+        end;
     else
         writeLn('Fetch Error: Requested fontID not found.');
     end;
@@ -154,6 +159,24 @@ begin
     response.ContentStream := fontStream;
 end;
 
+procedure routeFontOswald(request: TRequest; response: TResponse);
+const
+    fontID: int8 = 2;
+
+var 
+    fontStream: TFileStream;
+
+begin
+    response.Code := 200;
+    response.CodeText := 'OK';
+    response.ContentType := 'font/tff';
+    writeLn(request.ProtocolVersion + ' ' + request.Method + ' ' + IntToStr(response.Code) 
+    + ' ' + response.CodeText + ': Serving fontID ' + IntToStr(fontID) + ' to ' + request.RemoteAddr);
+    fontStream := fetchFont(fontID);
+    response.ContentLength := fontStream.Size;
+    response.ContentStream := fontStream;
+end;
+
 procedure routeBaseStyle(request: TRequest; response: TResponse);
 const
     styleSheetID: int8 = 0;
@@ -195,6 +218,7 @@ begin
     {serves the fonts}
     HTTPRouter.RegisterRoute('/fonts/AlumniSansPinstripe-Regular.ttf', @routeFontASPR);
     HTTPRouter.RegisterRoute('/fonts/AlumniSansPinstripe-Italic.ttf', @routeFontASPI);
+    HTTPRouter.RegisterRoute('/fonts/Oswald-VariableFont_wght.ttf', @routeFontOswald);
 
     {serves the images}
     HTTPRouter.RegisterRoute('/images/banner.png', @routeImageBanner);

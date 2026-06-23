@@ -12,14 +12,22 @@
   font-style: italic;
 }
 
+@font-face {
+  font-family: 'Oswald'; /*variable font*/
+  src: url("/fonts/Oswald-VariableFont_wght.ttf") format("truetype");
+  font-weight: 200 700;
+  font-style: normal;
+}
+
 body { 
     background-color: black; 
 }
 
 p {
     color: white;
-    font-family: "Alumni Sans Pinstripe", sans-serif;
-    font-size: 30px;
+    font-family: "Oswald", sans-serif;
+    font-size: 27px;
+    font-weight: 200;
     text-align: center;
 }
 
