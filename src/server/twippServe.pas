@@ -92,8 +92,8 @@ begin
     response.Code := 200;
     response.CodeText := 'OK';
     response.ContentType := 'font/tff';
-    writeLn(request.Method + ' ' + IntToStr(response.Code) + ' ' + response.CodeText +
-     ': Serving fontID ' + IntToStr(fontID) + ' to ' + request.RemoteAddr);
+    writeLn(request.ProtocolVersion + ' ' + request.Method + ' ' + IntToStr(response.Code) 
+    + ' ' + response.CodeText + ': Serving fontID ' + IntToStr(fontID) + ' to ' + request.RemoteAddr);
     fontStream := fetchFont(fontID);
     response.ContentLength := fontStream.Size;
     response.ContentStream := fontStream;
@@ -111,8 +111,8 @@ begin
     response.Code := 200;
     response.CodeText := 'OK';
     response.ContentType := 'font/tff';
-    writeLn(request.Method + ' ' + IntToStr(response.Code) + ' ' + response.CodeText +
-     ': Serving fontID ' + IntToStr(fontID) + ' to ' + request.RemoteAddr);
+    writeLn(request.ProtocolVersion + ' ' + request.Method + ' ' + IntToStr(response.Code) 
+    + ' ' + response.CodeText + ': Serving fontID ' + IntToStr(fontID) + ' to ' + request.RemoteAddr);
     fontStream := fetchFont(fontID);
     response.ContentLength := fontStream.Size;
     response.ContentStream := fontStream;
@@ -126,8 +126,9 @@ begin
     response.Code := 200;
     response.CodeText := 'OK';
     response.ContentType := 'text/css'; {this is important so chrome knows what type it is}
-    writeLn(request.Method + ' ' + IntToStr(response.Code) + ' ' + response.CodeText +
-     ': Serving styleSheetID ' + IntToStr(styleSheetID) + ' to ' + request.RemoteAddr);
+    writeLn(request.ProtocolVersion + ' ' + request.Method + ' ' + IntToStr(response.Code) 
+    + ' ' + response.CodeText + ': Serving styleSheetID ' + IntToStr(styleSheetID) + ' to ' 
+    + request.RemoteAddr);
     response.Content := fetchStyle(styleSheetID);
 end;
 
@@ -139,8 +140,8 @@ begin
     response.Code := 200;
     response.CodeText := 'OK';
     response.ContentType := 'text/html';
-    writeLn(request.Method + ' ' + IntToStr(response.Code) + ' ' + response.CodeText +
-     ': Serving pageID ' + IntToStr(routeID) + ' to ' + request.RemoteAddr);
+    writeLn(request.ProtocolVersion + ' ' + request.Method + ' ' + IntToStr(response.Code) 
+    + ' ' + response.CodeText + ': Serving pageID ' + IntToStr(routeID) + ' to ' + request.RemoteAddr);
     response.Content := fetchPage(routeID);
 end;
 
