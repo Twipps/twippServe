@@ -1,4 +1,4 @@
-```
-Author: Twipp
-Server backend for twipps.com
-```
+## Author 
+Twipp
+
+My personal website
