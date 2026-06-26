@@ -37,8 +37,8 @@ function objectsInit(){
     var objectStructure = [];
 
     var rect = new twippSwirly(
-        window.innerWidth/2, 
-        window.innerHeight/2, 
+        window.innerWidth/2 - 50, 
+        window.innerHeight/2 - 50, 
         100, 100, "#fff", 1, 
         0, 0);
 
@@ -55,7 +55,7 @@ function drawFrame() {
     bgCanvas.height = window.innerHeight;
 
     // clear the screen
-    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    //ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
     if (objectStructure.length == 0) {
         // initialize the current items on screen
@@ -70,17 +70,16 @@ function drawFrame() {
     // to rotate the rectangle we translate the canvas state to the
     //  center of the rect perform the rotation then reset
     if (objectStructure[0].angleDegree <= 360) {
-        // centering the canvas with respect to the square
-        ctx.translate(objectStructure[0].x + (0.5 * objectStructure[0].width),
-         objectStructure[0].y + (0.5 * objectStructure[0].height));
+        // centering the canvas origin with respect to the square
+        ctx.translate(objectStructure[0].x + (0.5 * objectStructure[0].width), objectStructure[0].y + (0.5 * objectStructure[0].height));
         // conversion from degrees to radians and rotate the canvas
         ctx.rotate((Math.PI/180) * (0.2 + objectStructure[0].angleDegree));
         // adding degrees to the current rectangle value
         objectStructure[0].angleDegree += 0.2;
-        console.log(objectStructure[0].angleDegree);
-        // returning the canvas to the origin
-        ctx.translate(-(objectStructure[0].x + (0.5 * objectStructure[0].width)), 
-        -(objectStructure[0].y + (0.5 * objectStructure[0].height)));
+        // console.log(objectStructure[0].angleDegree);
+        // returning the canvas to the original origin
+        console.log(-(objectStructure[0].x + (0.5 * objectStructure[0].width)) + " " + -(objectStructure[0].y + (0.5 * objectStructure[0].height)));
+        ctx.translate(-(objectStructure[0].x + (0.5 * objectStructure[0].width)), -(objectStructure[0].y + (0.5 * objectStructure[0].height)));
     } else {
         objectStructure[0].angleDegree = 0;
     }
