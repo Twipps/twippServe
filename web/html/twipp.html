@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html lang="en">
 <html>
 <head>
     <title>index</title>
@@ -9,15 +9,25 @@
 <!-- to containorize text you use things like <div> generic, or <article>, <section> -->
 <!-- then use css to define the box's behavior; containorizing is a structural concept -->
 <body>
-    <div class="bannerContainer">
-        <img src="/images/banner.png" alt="Website Banner" class="bannerImage">
+   <div class="background">
+        <div class="canvas">
+            <canvas id="backgroundCanvas"></canvas>
+        </div>
+        <script src="/js/backgroundEffect.js"></script>
     </div>
-    <div class="container">
-        <p>
-            Here is some example text for this website. It is pretty cool to see everything working together.
-            I am showing my findings to various individuals because it is neat. I was pretty clueless in setting 
-            up the banner, but I guess I understand how it works now. Stay tuned for the development for twipps.com
-        </p>
+
+    <div class="foreground">
+        <div class="bannerContainer">
+            <img src="/images/banner.png" alt="Website Banner" class="bannerImage">
+        </div>
+
+        <div class="container">
+            <p>
+                Here is some example text for this website. It is pretty cool to see everything working together.
+                I am showing my findings to various individuals because it is neat. I was pretty clueless in setting 
+                up the banner, but I guess I understand how it works now. Stay tuned for the development for twipps.com.
+            </p>
+        </div>
     </div>
 
 </body>

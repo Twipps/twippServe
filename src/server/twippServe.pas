@@ -49,6 +49,31 @@ begin
     result := rStream;
 end;
 
+function fetchScript(scriptID: int8): string;
+var
+    rScript: string;
+    stringList: TStringList;
+
+begin
+    stringList := TStringList.Create;
+
+    try
+    case scriptID of
+    0:
+        begin
+            stringList.LoadFromFile('../../web/js/backgroundEffect.js');
+            rScript := stringList.text;
+        end;
+    else
+        writeln('Fetch Error: Requested scriptID not found.');
+    end;
+
+    finally
+        stringList.Free;
+    end;
+    result := rScript;
+end;
+
 function fetchStyle(styleSheetID: int8): string;
 var
     rCss: string;
@@ -204,6 +229,19 @@ begin
     response.Content := fetchPage(routeID);
 end;
 
+procedure routeScriptBackground(request: TRequest; response: TResponse);
+const 
+    scriptID: int8 = 0;
+
+begin 
+    response.Code := 200;
+    response.CodeText := 'OK';
+    response.ContentType := 'text/javascript';
+    writeLn(request.ProtocolVersion + ' ' + request.Method + ' ' + IntToStr(response.Code) 
+    + ' ' + response.CodeText + ': Serving scriptID ' + IntToStr(scriptID) + ' to ' + request.RemoteAddr);
+    response.Content := fetchScript(scriptID);
+end;
+
 var 
     threaded: boolean;
 
@@ -222,6 +260,9 @@ begin
 
     {serves the images}
     HTTPRouter.RegisterRoute('/images/banner.png', @routeImageBanner);
+
+    {serves the scripts}
+    HTTPRouter.RegisterRoute('/js/backgroundEffect.js', @routeScriptBackground);
 
     {Sets up the port}
     Application.Port := 700;

@@ -25,13 +25,34 @@ body {
 
 p {
     color: white;
-    font-family: "Oswald", sans-serif;
+    font-family: "Alumni Sans Pinstripe", sans-serif;
     font-size: 27px;
     font-weight: 200;
     text-align: center;
 }
 
-.container {
+.background {
+  z-index: 1; /*how you control stacking of different tags*/
+}
+
+.canvas {
+  position:absolute;
+  left:0;
+  right:0; /*this zeroing out prevents whitespace*/
+  bottom:0;
+  top:0;
+}
+
+.foreground {
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  top:0;
+  z-index: 2; /*how you control stacking of different tags*/
+}
+
+.container { /*this is a placeholder right now*/
   max-width: 85vw; /*85 percent of view window width*/
   width: 75vh;
   height: fit-content;
@@ -48,7 +69,10 @@ p {
 .bannerContainer {
   width: 100%;       /* Spans full screen width */
   height: 250px;     /* Forces the banner height*/
+  min-width: max-content; /*keeps the banner image from resizing with the screen*/
+  max-height: max-content;
   opacity: 100%; /*make this shift gradual*/
+  background-color: black;
 }
 
 .bannerImage {  
