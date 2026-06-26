@@ -37,6 +37,7 @@ p {
 
 .canvas {
   position:absolute;
+  object-position: center;
   left:0;
   right:0; /*this zeroing out prevents whitespace*/
   bottom:0;
@@ -50,6 +51,8 @@ p {
   bottom:0;
   top:0;
   z-index: 2; /*how you control stacking of different tags*/
+  min-width: max-content;
+  min-height: max-content; /* supporting a buffer around the screen*/
 }
 
 .container { /*this is a placeholder right now*/
@@ -72,7 +75,7 @@ p {
   min-width: max-content; /*keeps the banner image from resizing with the screen*/
   max-height: max-content;
   opacity: 100%; /*make this shift gradual*/
-  background-color: black;
+  /*background-color: black;*/
 }
 
 .bannerImage {  
