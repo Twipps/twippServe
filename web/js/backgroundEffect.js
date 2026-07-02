@@ -16,46 +16,53 @@ if (bgCanvas.getContext) {
 var fgObjects = [];
 var bgObjects = [];
 
-// seperate from particles, organicly shaped background elements for spacial feeling;
-class organic{
-    constructor(x, y, colour, gradientColor){
-       this.x = x;
-       this.y = y;
-       this.colour = colour; 
-       this.gradientColor = gradientColor;
+class cartesian{
+    constructor(x, y){
+        this.x = x;
+        this.y = y;    
     }
 }
 
 // each particle type will have its own collider type; defining the bounds
 class collider{
-
+    constructor(type){
+        // ellastic is going to be the focus of this engine
+        this.type = type;
+    }
 }
-class particle{
-    constructor(x, y, 
-        rotationUnitVector, rotationSpeed, angleDegree, 
-        velocityX, velocityY, mass, gravity, accelerationX, accelerationY, 
-        amplitudeX, amplitudeY){
+class rigid{
+    constructor(pos, width, height, angleDegree, colour, gradientColor,  
+        mass, centerOfMass, velocity, acceleration, gravity, angularVelocity,
+        torque, amplitude, repulsion, canCollide, canRepulse, affectedByGravity){
 
-        // position on the screen
-        this.x = x;
-        this.y = y;
-
-        // values to define rotational movement
-        this.rotationUnitVector = rotationUnitVector;
-        this.rotationSpeed = rotationSpeed;
+        this.pos = pos;
+        // current angle of the particle
         this.angleDegree = angleDegree;
 
-        // values to define general movement
-        this.velocityX = velocityX;
-        this.velocityY = velocityY;
-        this.accelerationX = accelerationX;
-        this.accelerationY = accelerationY;
-        this.mass = mass;
-        this.gravity = gravity;
+        this.width = width;
+        this.height = height;
+        this.colour = colour;  
+        this.gradientColor = gradientColor;    
 
+        // values to define general movement
+        this.gravity = gravity;
+        this.velocity = velocity;
+        this.acceleration = acceleration;
+        this.angularVelocity = angularVelocity;
+        this.torque = torque;
+
+        this.mass = mass;
+        this.centerOfMass = centerOfMass;
         // tragectory amplitude; I want each tragecotry to have a settable sin() offset
-        this.amplitudeX = amplitudeX;
-        this.amplitudeY = amplitudeY;
+        this.amplitude = amplitude;
+        
+        // changes the behavior of the particle; paticles with this value will repel things away from it
+        this.repulsion = repulsion;
+        
+        // collisions t or f
+        this.canCollide = canCollide;
+        this.canRepulse = canRepulse;
+        this.affectedByGravity = affectedByGravity;
     }
 }
 
@@ -63,43 +70,81 @@ class particle{
 // with collisions i want there to be hard collids and 
 // a soft collide that slowly changes the tragectory, 
 // if a particle crosses into a html padding or marigins
-class swirlyCollider extends collider{
-
+class squareCollider extends collider{
+    constructor(type){
+        super(type);
+    }
 }
-class swirly extends particle(width, height, colour){
-    constructor(width, height, colour){
-       super();
+class swirly extends rigid{
+    constructor(pos, width, height, angleDegree, colour, gradientColor,  
+        mass, centerOfMass, velocity, acceleration, gravity, angularVelocity,
+        torque, amplitude, repulsion, canCollide, canRepulse, affectedByGravity, squareCollider){
 
-       this.width = width;
-       this.height = height;
-       this.colour = colour; 
+       super(pos, width, height, angleDegree, colour, gradientColor,  
+        mass, centerOfMass, velocity, acceleration, gravity, angularVelocity,
+        torque, amplitude, repulsion, canCollide, canRepulse, affectedByGravity);
+
+        this.squareCollider = squareCollider;
     }
 
     // draws the particle based on its internal values;
-    drawParticle(){};
+    drawRigid(){
+        ctx.save();
+
+        ctx.fillStyle = this.colour;
+
+        // centering the canvas origin with respect to the square
+        ctx.translate(this.pos.x + (0.5 * this.width), this.pos.y + (0.5 * this.height));
+
+        ctx.rotate((Math.PI/180) * this.angleDegree);
+
+        ctx.translate(this.pos.x + -(0.5 * this.width), this.pos.y + -(0.5 * this.height));
+
+        ctx.fillRect(this.pos.x, this.pos.y, this.width, this.height);
+
+        ctx.restore();
+    };
     // this will be used to update the stored values of the particle when things happen
-    updateParticle(){};
+    updateRigid(){
+
+    };
 }
 
 class plusCollider extends collider{
     
 }
-class plus extends particle{
-    drawParticle(){};
-    updateParticle(){};
+class plus extends rigid{
+    constructor(){
+       super();
+    }
+
+    drawRigid(){};
+    updateRigid(){};
 }
 
 class halfSwirlyCollider extends collider{
 
 }
-class halfSwirly extends particle{
-    drawParticle(){};
-    updateParticle(){};
+class halfSwirly extends rigid{
+    constructor(){
+       super();
+    }
+
+    drawRigid(){};
+    updateRigid(){};
 }
 
-// an object that's has properties to push back on particles getting close to is; like reversed polarity
-class forceField{
+// seperate from particles, organicly shaped background elements for spacial feeling;
+class organic extends rigid{
+}
 
+// an object that's has properties to push back on particles getting close to it, though is not a collidable
+// I think these will seperate the screen into two halves, one where the force is being applied, one where there isnt
+class forceField{
+    constructor(repulsion, forceDirection){
+        this.repulsion = repulsion;
+        this.forceDirection = forceDirection;
+    }
 }
 
 var activeCollisions = [];
@@ -127,11 +172,22 @@ function objectBalance() {}
 function objectsInit(){
     var objectStructure = [];
 
-    var rect = new swirly(
-        window.innerWidth/2 - 50, 
-        window.innerHeight/2 - 50, 
-        100, 100, "#fff", 1, 
-        0, 0);
+    var initX = 0;
+    var initY = 0;
+
+    var initWidth = 100;
+    var initHeight = 100;
+
+    var pos = new cartesian(initX, initY);
+    var centerOfMass = new cartesian(initWidth*0.5, initHeight*0.5);
+    var velocity = new cartesian(0,0);
+    var acceleration = new cartesian(0,0);
+
+    var collide = new squareCollider("elastic");
+    
+    var rect = new swirly(pos, initWidth, initHeight, 5, "#fff", "#fff", 10, centerOfMass, 
+        velocity, acceleration, 0, 0, 0, 0, 0, true, false, true, collide
+    );
 
     objectStructure.push(rect);
 
@@ -154,6 +210,8 @@ function drawFrame() {
         // this will also need an evaluation function
         fgObjects = objectsInit();
     }
+
+    fgObjects[0].drawRigid();
 
     window.requestAnimationFrame(drawFrame);
 }
