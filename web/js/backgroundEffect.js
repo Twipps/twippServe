@@ -2,10 +2,7 @@ const bgCanvas = document.getElementById("backgroundCanvas");
 const ctx = bgCanvas.getContext("2d");
 bgCanvas.style.background = "#212121";
 
-// array that contains all the items to be displayed on the screen
-var objectStructure = [];
-
-// checking for support from the browser
+// if the context returns false that means the browser doesnt support the canvas object
 if (bgCanvas.getContext) {
 
     console.log("-- Canvas Supported --")
@@ -15,28 +12,122 @@ if (bgCanvas.getContext) {
     console.log("-- Canvas Unsupported --")
 }
 
-class twippSwirly{
-    constructor(x, y, width, height, colour, rotationUnitVector, rotationSpeed, angleDegree){
-        // despite what I was taught js uses this exclusively
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.colour = colour;
-        this.rotationUnitVector = rotationUnitVector;
-        this.rotationSpeed = rotationSpeed;
-        this.angleDegree = angleDegree;
+// array that contains all the items to be displayed at the foreground of the canvas
+var fgObjects = [];
+var bgObjects = [];
+
+// seperate from particles, organicly shaped background elements for spacial feeling;
+class organic{
+    constructor(x, y, colour, gradientColor){
+       this.x = x;
+       this.y = y;
+       this.colour = colour; 
+       this.gradientColor = gradientColor;
     }
 }
 
-// will need to do checks periodically to see if objects 
-// need to be added to mantain effect; gens a varying amount
-// of objects on the screen depending on the current size of 
-// the screen.
+// each particle type will have its own collider type; defining the bounds
+class collider{
+
+}
+class particle{
+    constructor(x, y, 
+        rotationUnitVector, rotationSpeed, angleDegree, 
+        velocityX, velocityY, mass, gravity, accelerationX, accelerationY, 
+        amplitudeX, amplitudeY){
+
+        // position on the screen
+        this.x = x;
+        this.y = y;
+
+        // values to define rotational movement
+        this.rotationUnitVector = rotationUnitVector;
+        this.rotationSpeed = rotationSpeed;
+        this.angleDegree = angleDegree;
+
+        // values to define general movement
+        this.velocityX = velocityX;
+        this.velocityY = velocityY;
+        this.accelerationX = accelerationX;
+        this.accelerationY = accelerationY;
+        this.mass = mass;
+        this.gravity = gravity;
+
+        // tragectory amplitude; I want each tragecotry to have a settable sin() offset
+        this.amplitudeX = amplitudeX;
+        this.amplitudeY = amplitudeY;
+    }
+}
+
+// these will have different collision boxes maybe.
+// with collisions i want there to be hard collids and 
+// a soft collide that slowly changes the tragectory, 
+// if a particle crosses into a html padding or marigins
+class swirlyCollider extends collider{
+
+}
+class swirly extends particle(width, height, colour){
+    constructor(width, height, colour){
+       super();
+
+       this.width = width;
+       this.height = height;
+       this.colour = colour; 
+    }
+
+    // draws the particle based on its internal values;
+    drawParticle(){};
+    // this will be used to update the stored values of the particle when things happen
+    updateParticle(){};
+}
+
+class plusCollider extends collider{
+    
+}
+class plus extends particle{
+    drawParticle(){};
+    updateParticle(){};
+}
+
+class halfSwirlyCollider extends collider{
+
+}
+class halfSwirly extends particle{
+    drawParticle(){};
+    updateParticle(){};
+}
+
+// an object that's has properties to push back on particles getting close to is; like reversed polarity
+class forceField{
+
+}
+
+var activeCollisions = [];
+var nearForceField = [];
+
+// an algorithm for collision detection; gets activeCollisions;
+function sortSweep(){}
+
+// calculates the numbers for the collisions taking place; updates the particles for their next draw
+function settleCollisions(){}
+
+// depending on how close an object is to a force field determinds how much it pushes the velocity back in the other direction
+function settleForceFields(){}
+
+// when a particle is clicked on and dragged around
+function settleDrag(){}
+
+// while the user scrolls the particles will stay consitent to their position on the canvas, but the canvas will scroll
+function scrollOffset(){}
+
+// adds or removes particles depending on the size of the screen; maybe new particles can fade in
+function objectBalance() {}
+
+// first init at start up; generation depends on the current size of the screen
 function objectsInit(){
     var objectStructure = [];
 
-    var rect = new twippSwirly(
+    var rect = new swirly(
         window.innerWidth/2 - 50, 
         window.innerHeight/2 - 50, 
         100, 100, "#fff", 1, 
@@ -49,6 +140,7 @@ function objectsInit(){
     return objectStructure;
 }
 
+// responsible for executing everything necessariy to draw a frame
 function drawFrame() {
     // this may have to be on a loop
     bgCanvas.width = window.innerWidth;
@@ -57,12 +149,26 @@ function drawFrame() {
     // clear the screen
     //ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-    if (objectStructure.length == 0) {
+    if (fgObjects.length == 0) {
         // initialize the current items on screen
         // this will also need an evaluation function
-        objectStructure = objectsInit();
+        fgObjects = objectsInit();
     }
 
+    window.requestAnimationFrame(drawFrame);
+}
+
+// will need to do checks periodically to see if objects 
+// need to be added to mantain effect; gens a varying amount
+// of objects on the screen depending on the current size of 
+// the screen.
+
+/*
+have two object structures renders. swirls in the front, then darker backrgound
+shapes in the background that scroll slower with the page
+*/
+
+/* [first rotation and drawing test]
     // save old state before using it to make changes
     ctx.save();
     ctx.fillStyle = objectStructure[0].colour;
@@ -91,6 +197,4 @@ function drawFrame() {
 
     // restoring the previously saved state to prepare the canvas for the next change
     ctx.restore(); 
-
-    window.requestAnimationFrame(drawFrame);
-}
+*/
